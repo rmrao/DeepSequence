@@ -32,17 +32,12 @@ train_params = {
     "save_parameters"   :   False,
     }
 
-if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("alignment_file")
-    parser.add_argument("--output_dir", default="/shared/rmrao/deepsequence/params-no-consensus/")
-    parser.add_argument("--ensemble", default=None, type=int)
-    args = parser.parse_args()
-    if args.ensemble is not None:
-        model_params["r_seed"] += args.ensemble + 1
 
-    data_helper = helper.DataHelper(alignment_file=args.alignment_file,
+def train(alignment_file, output_dir, ensemble=None):
+    if ensemble is not None:
+        model_params["r_seed"] += ensemble + 1
+
+    data_helper = helper.DataHelper(alignment_file=alignment_file,
                                     calc_weights=True)
 
     vae_model   = model.VariationalAutoencoder(data_helper,
@@ -64,14 +59,14 @@ if __name__ == "__main__":
         random_seed                    =   model_params["r_seed"],
         )
 
-    job_string = helper.gen_job_string({"filename": os.path.basename(args.alignment_file).split(".")[0]}, model_params)
+    job_string = helper.gen_job_string({"filename": os.path.basename(alignment_file).split(".")[0]}, model_params)
 
     print (job_string)
 
-    date_prefix = os.path.basename(os.path.dirname(args.alignment_file))
-    path = os.path.join(args.output_dir, date_prefix)
-    if args.ensemble is not None:
-        path = path + "-ensemble" + str(args.ensemble)
+    date_prefix = os.path.basename(os.path.dirname(alignment_file))
+    path = os.path.join(output_dir, date_prefix)
+    if ensemble is not None:
+        path = path + "-ensemble" + str(ensemble)
     if not os.path.exists(path):
         os.mkdir(path)
     train.train(data_helper, vae_model,
@@ -82,3 +77,13 @@ if __name__ == "__main__":
         job_string              =   job_string)
 
     vae_model.save_parameters(file_prefix=job_string, path=path)
+
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("alignment_file")
+    parser.add_argument("--output_dir", default="/shared/rmrao/deepsequence/params-no-consensus/")
+    parser.add_argument("--ensemble", default=None, type=int)
+    args = parser.parse_args()
+    train(args.alignment_file, args.output_dir, args.ensemble)
