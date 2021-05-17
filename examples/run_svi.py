@@ -34,6 +34,8 @@ train_params = {
 
 
 def train_model(alignment_file, output_dir, ensemble=None):
+    if train_params["verbose"]:
+        print("Starting training")
     if ensemble is not None:
         model_params["r_seed"] += ensemble + 1
 
