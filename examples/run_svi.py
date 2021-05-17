@@ -33,7 +33,7 @@ train_params = {
     }
 
 
-def train(alignment_file, output_dir, ensemble=None):
+def train_model(alignment_file, output_dir, ensemble=None):
     if ensemble is not None:
         model_params["r_seed"] += ensemble + 1
 
@@ -86,4 +86,4 @@ if __name__ == "__main__":
     parser.add_argument("--output_dir", default="/shared/rmrao/deepsequence/params-no-consensus/")
     parser.add_argument("--ensemble", default=None, type=int)
     args = parser.parse_args()
-    train(args.alignment_file, args.output_dir, args.ensemble)
+    train_model(args.alignment_file, args.output_dir, args.ensemble)
