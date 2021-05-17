@@ -5,6 +5,7 @@ import theano.tensor as T
 from collections import defaultdict
 import cPickle
 import os
+import pdb
 
 
 class DataHelper:
@@ -313,7 +314,6 @@ class DataHelper:
                     # Add to the list
                     self.mutant_sequences.append("".join(focus_seq_copy))
                     self.mutant_sequences_descriptor.append(descriptor)
-
         # Then make the one hot sequence
         self.mutant_sequences_one_hot = np.zeros(\
             (len(self.mutant_sequences),len(self.focus_cols),len(self.alphabet)))
@@ -387,7 +387,7 @@ class DataHelper:
         self.mutant_sequences_descriptor = ["wt"]
 
         # run through the input file
-        INPUT = open(self.working_dir+"/"+input_filename, "r")
+        INPUT = open(input_filename, "r")
         for i,line in enumerate(INPUT):
             line = line.rstrip()
             if i >= 1:

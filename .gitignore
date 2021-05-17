@@ -1,2 +1,5 @@
 *.a2m
 *.fasta
+logs/
+*__pycache__*
+*.pyc

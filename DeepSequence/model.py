@@ -1,5 +1,6 @@
 from __future__ import print_function
 
+import os
 import numpy as np
 import theano
 import theano.tensor as T
@@ -714,22 +715,24 @@ class VariationalAutoencoder:
         return update, encode, decode, recognize, likelihoods,\
             all_likelihood_components, get_pattern_activations
 
-    def save_parameters(self, file_prefix):
+    def save_parameters(self, file_prefix, path):
         """Saves all the parameters in a way they can be retrieved later"""
+        if not os.path.exists(path):
+            os.mkdir(path)
         cPickle.dump({name: p.get_value() for name, p in self.params.items()},\
-            open(self.working_dir+"/params/"+file_prefix + "_params.pkl", "wb"))
+            open(path + "/" +file_prefix + "_params.pkl", "wb"))
         cPickle.dump({name: m.get_value() for name, m in self.m.items()}, \
-            open(self.working_dir+"/params/"+file_prefix +"_m.pkl", "wb"))
+            open(path + "/"+file_prefix +"_m.pkl", "wb"))
         cPickle.dump({name: v.get_value() for name, v in self.v.items()}, \
-            open(self.working_dir+"/params/"+file_prefix +"_v.pkl", "wb"))
+            open(path + "/"+file_prefix +"_v.pkl", "wb"))
 
     def load_parameters(self, file_prefix=""):
         """Load the variables in a shared variable safe way"""
-        p_list = cPickle.load(open(self.working_dir+"/params/"+file_prefix \
+        p_list = cPickle.load(open(file_prefix \
             + "_params.pkl", "rb"))
-        m_list = cPickle.load(open(self.working_dir+"/params/"+file_prefix \
+        m_list = cPickle.load(open(file_prefix \
             + "_m.pkl", "rb"))
-        v_list = cPickle.load(open(self.working_dir+"/params/"+file_prefix \
+        v_list = cPickle.load(open(file_prefix \
             + "_v.pkl", "rb"))
 
         for name in p_list.keys():
