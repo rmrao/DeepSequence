@@ -1,7 +1,8 @@
+#!/usr/bin/env python2
 from __future__ import print_function
 import sys
 import os
-sys.path.insert(0, "../DeepSequence/")
+sys.path.insert(0, "/app/DeepSequence/")
 import model  # noqa: E402
 import helper  # noqa: E402
 
@@ -26,11 +27,16 @@ model_params = {
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("alignment_file")
-    parser.add_argument("file_prefix")
+    parser.add_argument("--alignment_file", required=True)
+    parser.add_argument("--model_params", required=True)
     args = parser.parse_args()
 
-    basename = os.path.basename(args.alignment_file)[:-4]
+    basename = os.path.basename(args.alignment_file).rsplit(".", 1)[0]
+    outfile = os.path.join(os.path.dirname(args.file_prefix), basename + ".csv")
+    if os.path.exists(outfile):
+        print("Scores already exist, skipping.")
+        sys.exit(0)
+
     if not os.path.exists(args.file_prefix + "_params.pkl"):
         raise OSError("File Not Found! " + args.file_prefix)
 
@@ -60,7 +66,7 @@ if __name__ == "__main__":
     print("Parameters loaded")
 
     mutant_name_list, delta_elbos = data_helper.single_mutant_matrix(vae_model, N_pred_iterations=2000)
-    with open(os.path.join(os.path.dirname(args.file_prefix), "basename" + ".csv"), "w") as f:
+    with open(outfile, "w") as f:
         f.write("mutant,score\n")
         for mutant, elbo in zip(mutant_name_list, delta_elbos):
             f.write(mutant + "," + str(elbo) + "\n")

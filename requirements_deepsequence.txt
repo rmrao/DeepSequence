@@ -1,0 +1,3 @@
+Theano
+numpy
+scipy

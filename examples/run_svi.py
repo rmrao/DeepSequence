@@ -1,8 +1,9 @@
+#!/usr/bin/env python2
 import numpy as np
 import time
 import sys
 import cPickle
-sys.path.insert(0, "../DeepSequence/")
+sys.path.insert(0, "/app/DeepSequence/")
 import model
 import helper
 import train
@@ -33,14 +34,21 @@ train_params = {
     }
 
 
-def train_model(alignment_file, output_dir, ensemble=None):
+def train_model(alignment_file, output_dir, ensemble=None, viral=False):
+    name = os.path.basename(alignment_file).rsplit(".", 1)[0]
+    param_file = os.path.join(output_dir, name + "_params.pkl")
+    if os.path.exists(param_file):
+        print("Param file already exists, skipping.")
+        return
+
     if train_params["verbose"]:
         print("Starting training")
     if ensemble is not None:
         model_params["r_seed"] += ensemble + 1
 
     data_helper = helper.DataHelper(alignment_file=alignment_file,
-                                    calc_weights=True)
+                                    calc_weights=True,
+                                    theta=0.01 if viral else 0.2)
 
     vae_model   = model.VariationalAutoencoder(data_helper,
         batch_size                     =   model_params["bs"],
@@ -61,16 +69,10 @@ def train_model(alignment_file, output_dir, ensemble=None):
         random_seed                    =   model_params["r_seed"],
         )
 
-    job_string = helper.gen_job_string({"filename": os.path.basename(alignment_file).split(".")[0]}, model_params)
+    job_string = helper.gen_job_string({"filename": os.path.basename(alignment_file).rsplit(".", 1)[0]}, model_params)
 
     print (job_string)
 
-    date_prefix = os.path.basename(os.path.dirname(alignment_file))
-    path = os.path.join(output_dir, date_prefix)
-    if ensemble is not None:
-        path = path + "-ensemble" + str(ensemble)
-    if not os.path.exists(path):
-        os.mkdir(path)
     train.train(data_helper, vae_model,
         num_updates             =   train_params["num_updates"],
         save_progress           =   train_params["save_progress"],
@@ -78,14 +80,15 @@ def train_model(alignment_file, output_dir, ensemble=None):
         verbose                 =   train_params["verbose"],
         job_string              =   job_string)
 
-    vae_model.save_parameters(file_prefix=job_string, path=path)
+    vae_model.save_parameters(file_prefix=name, path=output_dir)
 
 
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("alignment_file")
-    parser.add_argument("--output_dir", default="/shared/rmrao/deepsequence/params-no-consensus/")
+    parser.add_argument("--alignment_file", required=True)
+    parser.add_argument("--output_dir", required=True)
     parser.add_argument("--ensemble", default=None, type=int)
+    parser.add_argument("--viral", action="store_true")
     args = parser.parse_args()
-    train_model(args.alignment_file, args.output_dir, args.ensemble)
+    train_model(args.alignment_file, args.output_dir, args.ensemble, args.viral)
