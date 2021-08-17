@@ -52,17 +52,21 @@ mounts = []
 def create_mount(mount_name: str, path: Path, read_only: bool = True) -> Path:
     global mounts
     path = path.absolute()
+    target_path = ROOT_MOUNT_DIRECTORY / mount_name
+
     if path.is_file():
         source_path = path.parent
+        target_file_path = target_path / path.name
     else:
         source_path = path
-    target_path = ROOT_MOUNT_DIRECTORY / mount_name
+        target_file_path = target_path
+
     logger.info(f"Mounting {source_path} -> {target_path}")
     mount = types.Mount(
         str(target_path), str(source_path), type="bind", read_only=read_only
     )
     mounts.append(mount)
-    return target_path / path.name
+    return target_file_path
 
 
 infile_path = create_mount("inputs", args.infile)

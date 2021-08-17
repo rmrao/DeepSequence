@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from typing import List, Tuple, Union, Iterator, Sequence
+from datetime import timedelta
 from timeit import default_timer as timer
 import math
 import sys
@@ -366,7 +367,8 @@ def align(
             break
 
     tottime = timer() - start
-    logger.info(f"Finished alignment in {int(tottime)}s")
+    td = timedelta(seconds=int(tottime))
+    logger.info(f"Finished alignment in {td}.")
 
     msa = msa.filter_coverage(0.5, axis="seqs")
     if keep_insertions:

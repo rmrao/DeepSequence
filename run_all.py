@@ -16,6 +16,7 @@ args = parser.parse_args()
 fasta_file = args.infile
 aln_file = args.outdir / fasta_file.with_suffix(".a3m").name
 prefix = args.outdir / fasta_file.stem
+
 align_command = ["/app/align.py", f"--infile={fasta_file}", f"--outfile={aln_file}", f"--seqdb={args.seqdb}", f"--cpu={args.cpu}"]
 train_command = ["/app/run_svi.py", f"--infile={aln_file}", f"--outdir={args.outdir}"]
 predict_command = ["/app/predict_single_mutant.py", f"--model_prefix={prefix}", f"--outdir={args.outdir}"]
