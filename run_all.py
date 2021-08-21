@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
+from typing import List
 import argparse
 from pathlib import Path
 import subprocess
+import tempfile
 
 parser = argparse.ArgumentParser(description="Runs deepsequence alignment and training.")
 parser.add_argument("-i", "--infile", type=Path, required=True)
@@ -27,6 +29,22 @@ if args.viral:
 if args.keep_insertions:
     align_command.append("--keep_insertions")
 
-subprocess.run(align_command).check_returncode()
-subprocess.run(train_command).check_returncode()
-subprocess.run(predict_command).check_returncode()
+
+def run_command_in_environment(command: List[str], environment: str):
+    to_run = [
+        "set -e",
+        f"conda activate {environment}",
+        " ".join(command),
+        "conda deactivate",
+    ]
+    full = "\n".join(to_run)
+    with tempfile.NamedTemporaryFile("w") as f:
+        f.write(full)
+        f.flush()
+        p = subprocess.run(["bash", "-l", f.name])
+        p.check_returncode()
+
+
+run_command_in_environment(align_command, "alignment")
+run_command_in_environment(train_command, "deepsequence")
+run_command_in_environment(predict_command, "deepsequence")

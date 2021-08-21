@@ -1,4 +1,5 @@
 from __future__ import print_function
+import re
 import numpy as np
 import theano
 import theano.tensor as T
@@ -163,8 +164,11 @@ class DataHelper:
 
         # We also expect the focus sequence to be formatted as:
         # >[NAME]/[start]-[end]
-        focus_loc = self.focus_seq_name.split("/")[-1]
-        start,stop = focus_loc.split("-")
+        if re.match(r">.+/\d+-\d+", self.focus_seq_name):
+            focus_loc = self.focus_seq_name.split("/")[-1]
+            start,stop = focus_loc.split("-")
+        else:
+            start, stop = 1, self.seq_len
         self.focus_start_loc = int(start)
         self.focus_stop_loc = int(stop)
         self.uniprot_focus_cols_list \

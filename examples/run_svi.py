@@ -86,9 +86,9 @@ def train_model(alignment_file, output_dir, ensemble=None, viral=False):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument("--alignment_file", required=True)
-    parser.add_argument("--output_dir", required=True)
+    parser.add_argument("--infile", required=True)
+    parser.add_argument("--outdir", required=True)
     parser.add_argument("--ensemble", default=None, type=int)
     parser.add_argument("--viral", action="store_true")
     args = parser.parse_args()
-    train_model(args.alignment_file, args.output_dir, args.ensemble, args.viral)
+    train_model(args.infile, args.outdir, args.ensemble, args.viral)

@@ -92,7 +92,9 @@ container = client.containers.run(
     remove=True,
     detach=True,
     mounts=mounts,
-    environment={},
+    environment={
+        "THEANO_FLAGS": "device=cuda,floatX=float32",
+    },
 )
 # Add signal handler to ensure CTRL+C also stops the running container.
 signal.signal(signal.SIGINT, lambda unused_sig, unused_frame: container.kill())
