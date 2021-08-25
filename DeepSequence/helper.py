@@ -290,8 +290,7 @@ class DataHelper:
         """ Predict the delta elbo for all single mutants """
 
         # Get the start and end index from the sequence name
-        start_idx, end_idx = self.focus_seq_name.split("/")[-1].split("-")
-        start_idx = int(start_idx)
+        start_idx, end_idx = self.focus_start_loc, self.focus_stop_loc
 
         wt_pos_focus_idx_tuple_list = []
         focus_seq_index = 0

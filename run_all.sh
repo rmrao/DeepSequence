@@ -1,4 +1,5 @@
 #!/bin/bash
+# Code for getopt modified from: https://stackoverflow.com/a/29754866
 
 # More safety, by turning some bugs into errors.
 # Without `errexit` you don’t need ! and can replace
@@ -98,6 +99,7 @@ conda activate alignment
 conda deactivate
 
 conda activate deepsequence
+mkdir -p logs
 /app/run_svi.py --infile $alnfile --outdir $outdir $viral
-/app/predict_single_mutant.py --model_prefix $prefix --outdir $outdir
+/app/predict_single_mutant.py --model_params $prefix --alignment_file $alnfile
 conda deactivate

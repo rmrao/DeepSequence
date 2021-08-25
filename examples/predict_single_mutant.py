@@ -32,13 +32,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     basename = os.path.basename(args.alignment_file).rsplit(".", 1)[0]
-    outfile = os.path.join(os.path.dirname(args.file_prefix), basename + ".csv")
+    outfile = os.path.join(os.path.dirname(args.model_params), basename + ".csv")
     if os.path.exists(outfile):
         print("Scores already exist, skipping.")
         sys.exit(0)
 
-    if not os.path.exists(args.file_prefix + "_params.pkl"):
-        raise OSError("File Not Found! " + args.file_prefix)
+    if not os.path.exists(args.model_params + "_params.pkl"):
+        raise OSError("File Not Found! " + args.model_params)
 
     data_helper = helper.DataHelper(alignment_file=args.alignment_file,
                                     calc_weights=False)
@@ -62,7 +62,7 @@ if __name__ == "__main__":
         random_seed                    =   model_params["r_seed"],
     )
     print("Model built")
-    vae_model.load_parameters(file_prefix=args.file_prefix)
+    vae_model.load_parameters(file_prefix=args.model_params)
     print("Parameters loaded")
 
     mutant_name_list, delta_elbos = data_helper.single_mutant_matrix(vae_model, N_pred_iterations=2000)
